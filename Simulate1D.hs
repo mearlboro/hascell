@@ -1,38 +1,35 @@
--- define zipper data type for generic 1D automaton as infinite list
--- the current cell is surrounded by two lists of all the other cells
+module Hascell.Simulate1D where
+
+import Control.Comonad
+import Data.Bits
+import Data.Bits.Bitwise (fromListBE)
+import Data.Word
+
+--- Data Type
 data W a = W [a] a [a]
 
-instance Functor W where
-    fmap f (W as x bs) = W (fmap f as) (f x) (fmap f bs)
-
-extract :: W a -> a
-extract (W _ x _) = x
-
-duplicate :: W a -> W (W a)
-duplicate w = W (tail $ iterate left w) w (tail $ iterate right w)
-
--- navigation
 left, right :: W a -> W a
 left  (W (l:ls) x    rs ) = W    ls  l (x:rs)
 right (W    ls  x (r:rs)) = W (x:ls) r rs
 
--- flatten to list
-list :: W a -> [a]
-list (W ls x rs) = reverse ls ++ [x] ++ rs
+instance Functor W where
+    fmap f (W as x bs) = W (fmap f as) (f x) (fmap f bs)
 
--- define how automaton changes state
-evolve :: (W a -> a) -> W a -> W a
-evolve rule w = fmap rule $ duplicate w
+instance Comonad W where
+    extract (W _ x _) = x
+    duplicate w = W (tail $ iterate left w) w (tail $ iterate right w)
+    extend rule w = fmap rule $ duplicate w
 
-evolveN :: (W a -> a) -> W a -> Int -> [ W a ]
-evolveN rule w n = take n $ iterate (evolve rule) w
 
--- since it's assumed infinite, we need to truncate it to display it
-truncateD :: Int -> W a -> W a
-truncateD d (W ls x rs) = W (take d ls) x (take d rs)
+--- Run a simulation
+experiment :: (W a -> a) -> W a -> Int -> [ W a ]
+experiment rule w n = take n $ iterate (extend rule) w
 
 run :: (W a -> a) -> W a -> Int -> Int -> [[a]]
-run rule w n d = map (list . (truncateD d)) $ evolveN rule w n
+run rule w n d = map (list . (truncateD d)) $ experiment rule w n
+    where
+        list (W ls x rs) = reverse ls ++ [x] ++ rs
+        truncateD d (W ls x rs) = W (take d ls) x (take d rs)
 
 --------------------------------------------------------------------------------
 -- for booleans, implement show function
