@@ -31,41 +31,21 @@ run rule w n d = map (list . (truncateD d)) $ experiment rule w n
         list (W ls x rs) = reverse ls ++ [x] ++ rs
         truncateD d (W ls x rs) = W (take d ls) x (take d rs)
 
---------------------------------------------------------------------------------
--- for booleans, implement show function
+--- Generic Wolfram Rules
+wolframWorld :: W Bool
+wolframWorld = W (repeat False) True (repeat False)
+
+wolframRule :: Word8 -> W Bool -> Bool
+wolframRule x w = testBit x $ fromListBE (fmap extract [left w, w, right w])
+
+
+--- Print to terminal
 showCell :: Bool -> String
 showCell True  = "██"
 showCell False = "  "
 
-showGen :: [Bool] -> String
-showGen cs = concat $ map showCell cs
-
---printRun :: (W a -> a) -> W a -> Int -> Int -> IO ()
-printRun rule w n d = mapM_ putStrLn generations
+printRun :: Word8 -> W Bool -> Int -> Int -> IO ()
+printRun r w n d = mapM_ putStrLn generations
     where
-        generations = map showGen $ run rule w n d
-
---------------------------------------------------------------------------------
------------------------------- Wolfram's rule 30 -------------------------------
---
--- starts with a True cell in the middle and evolves by the following rule
--- [ left_cell XOR (central_cell OR right_cell ]
-
-rule30start :: W Bool
-rule30start = W (repeat False) True (repeat False)
-
-rule30 :: W Bool -> Bool
-rule30 w = lc /= (cc || rc)
-    where lc = extract $ left  w
-          rc = extract $ right w
-          cc = extract w
-
---------------------------------------------------------------------------------
------------------------------- Wolfram's rule 30 -------------------------------
---
--- starts with a True cell in the middle and evolves by the following rule
--- [ left_cell XOR (central_cell OR right_cell ]
-rule90 :: W Bool -> Bool
-rule90 w = lc /=rc
-    where lc = extract $ left  w
-          rc = extract $ right w
+        generations = map showGen $ run (wolframRule r) w n d
+        showGen cs = concat $ map showCell cs
