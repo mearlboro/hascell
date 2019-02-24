@@ -1,5 +1,6 @@
-module Hascell.Simulate1D where
+module Main where
 
+import Codec.Picture
 import Control.Comonad
 import Data.Bits
 import Data.Bits.Bitwise (fromListBE)
@@ -31,6 +32,7 @@ run rule w n d = map (list . (truncateD d)) $ experiment rule w n
         list (W ls x rs) = reverse ls ++ [x] ++ rs
         truncateD d (W ls x rs) = W (take d ls) x (take d rs)
 
+
 --- Generic Wolfram Rules
 wolframWorld :: W Bool
 wolframWorld = W (repeat False) True (repeat False)
@@ -49,3 +51,24 @@ printRun r w n d = mapM_ putStrLn generations
     where
         generations = map showGen $ run (wolframRule r) w n d
         showGen cs = concat $ map showCell cs
+
+
+--- Print to image
+showPixel :: Bool -> PixelRGB8
+showPixel True  = PixelRGB8 0x00 0x00 0x00
+showPixel False = PixelRGB8 0xff 0xff 0xff
+
+imgRun :: Word8 -> W Bool -> Int -> Int -> DynamicImage
+imgRun r w n d = ImageRGB8 $ generateImage getPixel (d * 2+1) n
+    where
+        getPixel x y = showPixel $ generations !! y !! x
+        generations  = run (wolframRule r) w n d
+
+main :: IO()
+main = sequence_ $ map save [0..255]
+    where
+        save r = savePngImage (imgPath r) (imgRun r wolframWorld n d)
+        imgPath r = "img/rule" ++ show r ++ ".png"
+        rs = [0..255]
+        n  = 1024
+        d  = 1024
