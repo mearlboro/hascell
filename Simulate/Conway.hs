@@ -10,7 +10,9 @@ module Hascell.Simulate2D.Conway where
     import System.Process (rawSystem)
 
 --- RULE
-    gameOfLife :: U (Int, Int) Bool -> Bool
+    type GameOfLife = U (Int, Int) Bool
+
+    gameOfLife :: GameOfLife -> Bool
     gameOfLife u
         |     cell && (numNeighbours u True < 2)          = False
         |     cell && (numNeighbours u True `elem` [2,3]) = True
@@ -21,11 +23,11 @@ module Hascell.Simulate2D.Conway where
             cell = extract u
 
 --- SHOW
-    stringShow :: U (Int, Int) Bool -> [String]
+    stringShow :: GameOfLife -> [String]
     stringShow u@(U (i, j) a) = map showRow $ [ U (k, j) a | k <- [0 .. height u] ]
         where
-            showCell True = "██"
-            showCell False  = "  "
+            showCell True  = "██"
+            showCell False = "  "
             showRow (U (i, j) a) = concatMap showCell [ extract $ U (i, k) a | k <- [0 .. width u] ]
 
     conwayRun u = do
@@ -35,7 +37,7 @@ module Hascell.Simulate2D.Conway where
         conwayRun (extend gameOfLife u)
 
 --- PATTERNS
-    glider :: U (Int, Int) Bool
+    glider :: GameOfLife
     glider =  U (0, 0) xs
         where
             ys = listArray ((0, 0), (4,4)) $ repeat False
