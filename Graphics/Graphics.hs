@@ -61,5 +61,5 @@ module Hascell.Graphics where
         where
             img = pngFrom2D conwayPixels zoom (run gameOfLife w n !! (n - 1))
 
-    conwayExport :: GameOfLife -> Int -> Int -> IO ()
+    conwayExport :: GameOfLife -> Int -> Int -> Int -> IO ()
     conwayExport w n zoom delay = either print id $ exportGifFrom2D (run gameOfLife w n) conwayPixels zoom delay (conwayPath n "gif")
