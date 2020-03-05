@@ -1,5 +1,3 @@
-{-# LANGUAGE DeriveFunctor #-}
-{-# LANGUAGE BangPatterns #-}
 module Hascell.Simulate2D.Conway where
 
     import Hascell.Simulate
@@ -40,7 +38,7 @@ module Hascell.Simulate2D.Conway where
     glider :: GameOfLife
     glider =  U (0, 0) xs
         where
-            ys = listArray ((0, 0), (4,4)) $ repeat False
+            ys = listArray ((0, 0), (30,30)) $ repeat False
             xs = ys // [ ((1, 3), True)
                        , ((2, 2), True)
                        , ((0, 1), True)

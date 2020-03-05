@@ -1,4 +1,3 @@
-{-# LANGUAGE DeriveFunctor #-}
 module Hascell.Simulate2D where
 
     import Hascell.Simulate
