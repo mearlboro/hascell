@@ -1,4 +1,4 @@
-module Hascell.Simulate1D.Wolfram where
+module Hascell.Wolfram where
 
     import Hascell.Simulate
     import Hascell.Simulate1D

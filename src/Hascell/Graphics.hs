@@ -1,9 +1,9 @@
 module Hascell.Graphics where
 
     import Hascell.Simulate
-    import Hascell.Simulate1D.Wolfram
+    import Hascell.Wolfram
     import Hascell.Simulate2D
-    import Hascell.Simulate2D.Conway
+    import Hascell.Conway
 
     import Codec.Picture
     import Data.Array

@@ -1,4 +1,4 @@
-module Hascell.Simulate2D.Conway where
+module Hascell.Conway where
 
     import Hascell.Simulate
     import Hascell.Simulate2D
