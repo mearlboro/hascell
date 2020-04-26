@@ -34,14 +34,3 @@ module Hascell.Conway where
         mapM_ putStrLn $ stringShow u
         conwayRun (extend gameOfLife u)
 
---- PATTERNS
-    glider :: GameOfLife
-    glider =  U (0, 0) xs
-        where
-            ys = listArray ((0, 0), (30,30)) $ repeat False
-            xs = ys // [ ((1, 3), True)
-                       , ((2, 2), True)
-                       , ((0, 1), True)
-                       , ((1, 1), True)
-                       , ((2, 1), True) ]
-
