@@ -22,7 +22,7 @@ module Hascell.Graphics where
     pngFrom2D :: ColourMap a -> Int -> U (Int, Int) a -> DynamicImage
     pngFrom2D colours zoom u = ImageRGB8 $ generateImage getPixel w h
         where
-            getPixel x y = colours $ (arr u) ! (x `div` zoom, y `div` zoom)
+            getPixel x y = colours $ (arr u) ! (y `div` zoom, x `div` zoom)
             h = zoom * height u
             w = zoom * width  u
 

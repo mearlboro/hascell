@@ -13,7 +13,7 @@ module Hascell.Conway where
     patternGameOfLife :: [(Int, Int)] -> GameOfLife
     patternGameOfLife coords = U (0, 0) cells
         where
-            empty = listArray ((0, 0), (w, h)) $ repeat False
+            empty = listArray ((0, 0), (w + 1, h + 1)) $ repeat False
             alive = zipWith (,) coords $ repeat True
             cells = empty // alive
             w = maximum $ map fst coords
@@ -43,4 +43,3 @@ module Hascell.Conway where
         rawSystem "clear" []
         mapM_ putStrLn $ stringShowStep u
         stringShow (extend gameOfLifeRule u)
-
