@@ -28,10 +28,10 @@ module Hascell.Wolfram where
 
 --- SHOW
     stringShow :: Wolfram -> Word8 -> Int -> IO ()
-    stringShow w r n = mapM_ putStrLn strings
+    stringShow u r n = mapM_ putStrLn strings
         where
             strings = map (concat . map showCell . list) us
             showCell True  = "██"
             showCell False = "  "
             list (U i a) = elems a
-            us = run (wolframRule r) w n
+            us = run (wolframRule r) u n
