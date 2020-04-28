@@ -7,11 +7,21 @@ module Hascell.Conway where
     import Data.Array
     import System.Process (rawSystem)
 
---- RULE
+--- WORLD
     type GameOfLife = U (Int, Int) Bool
 
-    gameOfLife :: GameOfLife -> Bool
-    gameOfLife u
+    patternGameOfLife :: [(Int, Int)] -> GameOfLife
+    patternGameOfLife coords = U (0, 0) cells
+        where
+            empty = listArray ((0, 0), (w, h)) $ repeat False
+            alive = zipWith (,) coords $ repeat True
+            cells = empty // alive
+            w = maximum $ map fst coords
+            h = maximum $ map snd coords
+
+--- RULES
+    gameOfLifeRule :: GameOfLife -> Bool
+    gameOfLifeRule u
         |     cell && (numNeighbours u True < 2)          = False
         |     cell && (numNeighbours u True `elem` [2,3]) = True
         |     cell && (numNeighbours u True > 3)          = False
@@ -21,16 +31,16 @@ module Hascell.Conway where
             cell = extract u
 
 --- SHOW
-    stringShow :: GameOfLife -> [String]
-    stringShow u@(U (i, j) a) = map showRow $ [ U (k, j) a | k <- [0 .. height u] ]
+    stringShowStep :: GameOfLife -> [String]
+    stringShowStep u@(U (i, j) a) = map showRow $ [ U (k, j) a | k <- [0 .. height u] ]
         where
             showCell True  = "██"
             showCell False = "  "
             showRow (U (i, j) a) = concatMap showCell [ extract $ U (i, k) a | k <- [0 .. width u] ]
 
-    conwayRun u = do
+    stringShow u = do
         getLine
         rawSystem "clear" []
-        mapM_ putStrLn $ stringShow u
-        conwayRun (extend gameOfLife u)
+        mapM_ putStrLn $ stringShowStep u
+        stringShow (extend gameOfLifeRule u)
 

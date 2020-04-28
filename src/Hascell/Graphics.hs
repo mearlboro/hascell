@@ -40,13 +40,13 @@ module Hascell.Graphics where
     wolframPath :: Word8 -> String
     wolframPath r = "img/wolfram/rule_" ++ show r ++ ".png"
 
-    wolframExport :: Int -> Int -> Int -> Word8 -> IO ()
-    wolframExport n d zoom r = savePngImage (wolframPath r) img
+    wolframExport :: Wolfram -> Int -> Int -> Word8 -> IO ()
+    wolframExport w n zoom r = savePngImage (wolframPath r) img
         where
-            img = pngFrom1D wolframPixels zoom (run (wolframRule r) (wolframWorld d) n)
+            img = pngFrom1D wolframPixels zoom (run (wolframRule r) w n)
 
-    wolframExportAll :: Int -> Int -> Int -> IO ()
-    wolframExportAll n d zoom = sequence_ $ map (wolframExport n d zoom) [0..255]
+    wolframExportAll :: Wolfram -> Int -> Int -> IO ()
+    wolframExportAll w n zoom = sequence_ $ map (wolframExport w n zoom) [0..255]
 
 --- Export Conway
     conwayPixels :: ColourMap Bool
@@ -57,9 +57,9 @@ module Hascell.Graphics where
     conwayPath w ext = "img/conway/pattern_" ++ show w ++ "." ++ ext
 
     conwayExportStep :: GameOfLife -> Int -> Int -> IO ()
-    conwayExportStep w n zoom = savePngImage (conwayPath n "png") img
+    conwayExportStep w n zoom = savePngImage (conwayPath w "png") img
         where
-            img = pngFrom2D conwayPixels zoom (run gameOfLife w n !! (n - 1))
+            img = pngFrom2D conwayPixels zoom (run gameOfLifeRule w n !! (n - 1))
 
     conwayExport :: GameOfLife -> Int -> Int -> Int -> IO ()
-    conwayExport w n zoom delay = either print id $ exportGifFrom2D (run gameOfLife w n) conwayPixels zoom delay (conwayPath n "gif")
+    conwayExport w n zoom delay = either print id $ exportGifFrom2D (run gameOfLifeRule w n) conwayPixels zoom delay (conwayPath w "gif")
