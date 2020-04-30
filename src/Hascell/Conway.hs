@@ -22,10 +22,10 @@ module Hascell.Conway where
 --- RULES
     gameOfLifeRule :: GameOfLife -> Bool
     gameOfLifeRule u
-        |     cell && (numNeighbours u True < 2)          = False
-        |     cell && (numNeighbours u True `elem` [2,3]) = True
-        |     cell && (numNeighbours u True > 3)          = False
-        | not cell && (numNeighbours u True == 3)         = True
+        |     cell && (numNeighbours Moore u True < 2)          = False
+        |     cell && (numNeighbours Moore u True `elem` [2,3]) = True
+        |     cell && (numNeighbours Moore u True > 3)          = False
+        | not cell && (numNeighbours Moore u True == 3)         = True
         | otherwise                                       = cell
         where
             cell = extract u

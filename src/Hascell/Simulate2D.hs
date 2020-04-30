@@ -6,6 +6,7 @@ module Hascell.Simulate2D where
     import Data.Array
 
     data Move = N | NE | E | SE | S | SW | W | NW deriving (Bounded, Enum, Eq, Show)
+    data Neighbourhood = Moore | VonNeumann deriving (Bounded, Enum, Eq, Show)
 
     height, width :: (Integral i, Ix i) => U (i, i) a -> i
     height (U _ a) = fst . snd . bounds $ a
@@ -25,6 +26,15 @@ module Hascell.Simulate2D where
             h = height u + 1
             w = width  u + 1
 
+    neighboursMoore :: (Integral i, Ix i) => U (i, i) a -> [U (i, i) a]
+    neighboursMoore u = map (neighbour u) [N ..]
 
-    numNeighbours :: (Eq a) => U (Int, Int) a -> a -> Int
-    numNeighbours u a = length $ filter (==a) $ fmap extract $ map (neighbour u) [N ..]
+    neighboursVonNeumann :: (Integral i, Ix i) => U (i, i) a -> [U (i, i) a]
+    neighboursVonNeumann u = map (neighbour u) [N, E, S, W]
+
+    numNeighbours :: (Eq a) => Neighbourhood -> U (Int, Int) a -> a -> Int
+    numNeighbours neigh u a = length $ filter (==a) $ fmap extract neighbourhood
+        where
+            neighbourhood = case neigh of
+                Moore      -> neighboursMoore      u
+                VonNeumann -> neighboursVonNeumann u
