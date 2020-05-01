@@ -15,18 +15,17 @@ module Hascell.SimulateRand2D where
 
     neighbour :: (Integral i, Ix i, RandomGen r) => RandU r (i, i) a -> i -> Move -> RandU r (i, i) a
     neighbour u@(RandU r (i, j) a) steps move = case move of
-        N  -> RandU r' (i,                   (j + steps) `mod` w) a
-        NE -> RandU r' ((i + steps) `mod` h, (j + steps) `mod` w) a
-        E  -> RandU r' ((i + steps) `mod` h,  j)              a
-        SE -> RandU r' ((i + steps) `mod` h, (j - steps) `mod` w) a
-        S  -> RandU r' (i,                   (j - steps) `mod` w) a
-        SW -> RandU r' ((i - steps) `mod` h, (j - steps) `mod` w) a
-        W  -> RandU r' ((i - steps) `mod` h,  j)              a
-        NW -> RandU r' ((i - steps) `mod` h, (j + steps) `mod` w) a
+        N  -> RandU r (i,                   (j + steps) `mod` w) a
+        NE -> RandU r ((i + steps) `mod` h, (j + steps) `mod` w) a
+        E  -> RandU r ((i + steps) `mod` h,  j)              a
+        SE -> RandU r ((i + steps) `mod` h, (j - steps) `mod` w) a
+        S  -> RandU r (i,                   (j - steps) `mod` w) a
+        SW -> RandU r ((i - steps) `mod` h, (j - steps) `mod` w) a
+        W  -> RandU r ((i - steps) `mod` h,  j)              a
+        NW -> RandU r ((i - steps) `mod` h, (j + steps) `mod` w) a
         where
             h  = height u + 1
             w  = width  u + 1
-            (_, r') = next r
 
     neighboursMoore :: (Integral i, Ix i, RandomGen r) => RandU r (i, i) a -> [RandU r (i, i) a]
     neighboursMoore u = map (neighbour u 1) [N ..]
