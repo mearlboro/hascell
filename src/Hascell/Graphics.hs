@@ -4,6 +4,7 @@ module Hascell.Graphics where
     import Hascell.Wolfram
     import Hascell.Simulate2D
     import Hascell.Conway
+    import Hascell.Excitable
 
     import Codec.Picture
     import Data.Array
@@ -63,3 +64,21 @@ module Hascell.Graphics where
 
     conwayExport :: String -> GameOfLife -> Int -> Int -> Int -> IO ()
     conwayExport name u n zoom delay = either print id $ exportGifFrom2D (run gameOfLifeRule u n) conwayPixels zoom delay (conwayPath name "gif")
+
+--- Export Greenberg-Hastings
+    excitablePixels :: ColourMap ExcitableCell
+    excitablePixels Spike = PixelRGB8 0x00 0xff 0x33
+    excitablePixels Rest  = PixelRGB8 0xff 0xff 0x00
+    excitablePixels Quiet = PixelRGB8 0xff 0xff 0xff
+
+    excitablePath :: String -> String -> String
+    excitablePath name ext = "img/excitable/pattern_" ++ name ++ "." ++ ext
+
+    excitableExportStep :: String -> ExcitableMedium -> Int -> Int -> IO ()
+    excitableExportStep name u n zoom = savePngImage (excitablePath name "png") img
+        where
+            img = pngFrom2D excitablePixels zoom (run greenbergHastingsRule u n !! (n - 1))
+
+    excitableExport :: String -> ExcitableMedium -> Int -> Int -> Int -> IO ()
+    excitableExport name u n zoom delay = either print id $ exportGifFrom2D (run greenbergHastingsRule u n) excitablePixels zoom delay (excitablePath name "gif")
+
