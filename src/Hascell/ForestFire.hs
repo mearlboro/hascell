@@ -36,7 +36,7 @@ module Hascell.ForestFire where
             tree = extract u
             rs = take n $ randomRs (0.0, 1.0) r
             n = (height u + 1) * (width u + 1)
-            rand = rs !! ( i * j )
+            rand = rs !! ( i * (width u + 1) + j )
             test val = rand < val
 
 --- SHOW
