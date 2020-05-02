@@ -17,7 +17,7 @@ module Hascell.ForestFire where
     patternForest :: Float -> Float -> [(Int, Int)] -> Forest
     patternForest f p coords = EnvT (f, p) (RandU r (0, 0) cells)
         where
-            r = mkStdGen $ round $ 16860353668.0 ** f / p
+            r = mkStdGen $ round $ 16860353668.0 / f / p
             empty = listArray ((0, 0), (w + 1, h + 1)) $ repeat Dead
             alive = zipWith (,) coords $ repeat Live
             cells = empty // alive
@@ -48,6 +48,8 @@ module Hascell.ForestFire where
             showCell Fire = "██"
             showCell Dead = "  "
             showRow (U (i, j) a) = concatMap showCell [ extract $ U (i, k) a | k <- [0 .. width u] ]
+
+    runRand rule u n = take n $ iterate (extend rule) u
 
     stringShowF f@(EnvT _ u@(RandU _ (i, j) a)) = do
         getLine

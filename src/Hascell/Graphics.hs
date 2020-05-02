@@ -3,12 +3,15 @@ module Hascell.Graphics where
     import Hascell.Simulate
     import Hascell.Wolfram
     import Hascell.Simulate2D
+    import qualified Hascell.SimulateRand2D as R
     import Hascell.Conway
     import Hascell.Excitable
+    import Hascell.ForestFire
 
     import Codec.Picture
     import Data.Array
     import Data.Word
+    import Control.Comonad.Trans.Env
 
     type ColourMap a = (a -> PixelRGB8)
 
@@ -82,3 +85,28 @@ module Hascell.Graphics where
     excitableExport :: String -> ExcitableMedium -> Int -> Int -> Int -> IO ()
     excitableExport name u n zoom delay = either print id $ exportGifFrom2D (run greenbergHastingsRule u n) excitablePixels zoom delay (excitablePath name "gif")
 
+--- Export Forest
+    pngFrom2DRand :: ColourMap Tree -> Int -> Forest -> DynamicImage
+    pngFrom2DRand colours zoom (EnvT _ u) = ImageRGB8 $ generateImage getPixel w h
+        where
+            getPixel x y = colours $ (arr u) ! (y `div` zoom, x `div` zoom)
+            h = zoom * R.height u
+            w = zoom * R.width  u
+            arr (RandU _ _ a) = a
+
+    exportGifFrom2DRand :: [Forest] -> ColourMap Tree -> Int -> Int -> String -> Either String (IO ())
+    exportGifFrom2DRand us colours zoom delay path = writeGifAnimation path delay LoopingForever imgs
+        where
+            imgs = map (dynToImg . pngFrom2DRand colours zoom) us
+            dynToImg (ImageRGB8 img) = img
+
+    forestPixels :: ColourMap Tree
+    forestPixels Fire = PixelRGB8 0xcc 0x33 0x00
+    forestPixels Live = PixelRGB8 0x00 0xcc 0x33
+    forestPixels Dead = PixelRGB8 0x00 0x00 0x00
+
+    forestPath :: String -> String
+    forestPath ext = "img/excitable/pattern_forest." ++ ext
+
+    forestExport :: Forest -> Int -> Int -> Int -> IO ()
+    forestExport u n zoom delay = either print id $ exportGifFrom2DRand (runRand forestFireRule u n) forestPixels zoom delay (forestPath "gif")
