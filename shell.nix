@@ -12,6 +12,7 @@ let
     ghc.bitwise
     ghc.comonad
     ghc.JuicyPixels
+    ghc.random
   ];
 
   shell = pkgs.stdenv.mkDerivation {
@@ -19,7 +20,8 @@ let
     buildInputs = [
       pkgs.cabal-install
       pkgs.nix
-
+      pkgs.haskellPackages.hp2html
+      pkgs.haskellPackages.hp2pretty
       (pkgs.haskellPackages.ghcWithPackages ghcInputs)
     ];
   };
