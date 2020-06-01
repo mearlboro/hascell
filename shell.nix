@@ -19,7 +19,8 @@ let
     buildInputs = [
       pkgs.cabal-install
       pkgs.nix
-
+      pkgs.haskellPackages.hp2html
+      pkgs.haskellPackages.hp2pretty
       (pkgs.haskellPackages.ghcWithPackages ghcInputs)
     ];
   };

@@ -2,9 +2,9 @@ module Main where
 
 import Hascell.Conway
 import Hascell.Graphics
-import System.IO  
+import System.IO
 import System.FilePath
-      
+
 parseInput :: String -> [(Int, Int)]
 parseInput x = map pairs . map (map read) . map words . lines $ x
     where
@@ -13,17 +13,22 @@ parseInput x = map pairs . map (map read) . map words . lines $ x
 stringRunGameOfLife :: IO ()
 stringRunGameOfLife = do
     pattern <- getLine
-    contents <- readFile ("meta/patterns/" ++ pattern) 
+    contents <- readFile ("meta/patterns/" ++ pattern)
     u <- return . patternGameOfLife . parseInput $ contents
     stringShow u
 
 imgRunGameOfLife :: IO ()
 imgRunGameOfLife = do
     pattern <- getLine
-    contents <- readFile ("meta/patterns/" ++ pattern) 
+    contents <- readFile ("meta/patterns/" ++ pattern)
     u <- return . patternGameOfLife . parseInput $ contents
     conwayExport pattern u 100 5 10
 
+testGameOfLife :: IO ()
+testGameOfLife = do
+    contents <- readFile ("meta/patterns/Junk")
+    u <- return . patternGameOfLife . parseInput $ contents
+    conwayExport "junk_test" u 1000 2 10
 
 main :: IO ()
-main = putStrLn "Welcome to Hascell"
+main = testGameOfLife

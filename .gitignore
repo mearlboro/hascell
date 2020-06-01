@@ -1,8 +1,12 @@
 # ignore directory where images are generated
 img/*
-# ignore compiled files
+# ignore compiled or profiler files
 *.hi
 *.o
+src/Main
+out/*
+*.prof
+*.hp
 # vim stuff
 *.swp
 *.swo
