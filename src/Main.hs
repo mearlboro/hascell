@@ -1,6 +1,7 @@
 module Main where
 
 import Hascell.Conway
+import Hascell.ForestFire
 import Hascell.Graphics
 import System.IO
 import System.FilePath
@@ -30,5 +31,9 @@ testGameOfLife = do
     u <- return . patternGameOfLife . parseInput $ contents
     conwayExport "junk_test" u 1000 2 10
 
+testForestFire :: IO ()
+testForestFire = do
+    forestExport "forestfire" (newForest 0.001 0.1) 200 3 10
+
 main :: IO ()
-main = testGameOfLife
+main = testForestFire

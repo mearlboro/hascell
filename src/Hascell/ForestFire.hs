@@ -14,6 +14,18 @@ module Hascell.ForestFire where
     type Params = (StdGen, Float, Float)
     type Forest = EnvT Params (U (Int, Int)) Tree
 
+    get :: Ix i => EnvT Params (U i) a -> U i a
+    get (EnvT _ u) = u
+
+    extendRand :: (Forest -> Tree) -> Forest -> Forest
+    extendRand rule u@(EnvT (g, f, p) (U (i, j) a)) = EnvT (g'', f, p) r
+        where
+            (g', g'') = split g
+            u' = EnvT (g', f, p) (U (i, j) a)
+            EnvT _ r = extend rule u'
+
+    runRand rule u n = take n $ iterate (extendRand rule) u
+
 --- RULES
     forestFireRule :: Forest -> Tree
     forestFireRule (EnvT (g, f, p) u@(U (i,j) a)) = case tree of
