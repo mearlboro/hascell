@@ -43,9 +43,10 @@ module Hascell.ForestFire where
         getLine
         rawSystem "clear" []
         mapM_ putStrLn $ stringShowStep u
-        let (_, g') = next g
-        let u' = EnvT (g', f, p) (U (i, j) a)
-        stringShowF (extend forestFireRule u')
+        let (g', g'') = split g
+            u' = EnvT (g', f, p) (U (i, j) a)
+            EnvT _ r = extend forestFireRule u'
+        stringShowF (EnvT (g'', f, p) r)
 
 
     newForest f p = EnvT (g, f, p) (U (0, 0) cells)
