@@ -2,6 +2,7 @@ module Hascell.ForestFire where
 
     import Hascell.Simulate
     import Hascell.Simulate2D
+    import Hascell.Random
 
     import Control.Comonad
     import Control.Comonad.Trans.Env
@@ -11,24 +12,15 @@ module Hascell.ForestFire where
 
 --- WORLD
     data Tree   = Live | Fire | Dead deriving (Eq, Show)
-    type Params = (StdGen, Float, Float)
-    type Forest = EnvT Params (U (Int, Int)) Tree
+    type Params = (Float, Float)
+    type Forest = RandT StdGen (EnvT Params (U (Int, Int))) Tree
 
-    get :: Ix i => EnvT Params (U i) a -> U i a
-    get (EnvT _ u) = u
-
-    extendRand :: (Forest -> Tree) -> Forest -> Forest
-    extendRand rule u@(EnvT (g, f, p) (U (i, j) a)) = EnvT (g'', f, p) r
-        where
-            (g', g'') = split g
-            u' = EnvT (g', f, p) (U (i, j) a)
-            EnvT _ r = extend rule u'
-
-    runRand rule u n = take n $ iterate (extendRand rule) u
-
+    get :: Ix i => RandT StdGen (EnvT Params (U i)) a -> U i a
+    get (RandT _ (EnvT _ u)) = u
+                               
 --- RULES
     forestFireRule :: Forest -> Tree
-    forestFireRule (EnvT (g, f, p) u@(U (i,j) a)) = case tree of
+    forestFireRule (RandT g (EnvT (f, p) u@(U (i,j) a))) = case tree of
         Fire -> Dead
         Dead -> if (rand < p) then Live else Dead
         Live -> if (numNeighbours Moore u Fire > 0)
@@ -43,7 +35,7 @@ module Hascell.ForestFire where
 
 --- SHOW
     stringShowStep :: Forest -> [String]
-    stringShowStep (EnvT _ u@(U (i, j) a))
+    stringShowStep (RandT _ (EnvT _ u@(U (i, j) a)))
       = map showRow $ [ U (k, j) a | k <- [0 .. height u] ]
         where
             showCell Live = "{}"
@@ -51,17 +43,7 @@ module Hascell.ForestFire where
             showCell Dead = "  "
             showRow (U (i, j) a) = concatMap showCell [ extract $ U (i, k) a | k <- [0 .. width u] ]
 
-    stringShowF u@(EnvT (g, f, p) (U (i, j) a)) = do
-        getLine
-        rawSystem "clear" []
-        mapM_ putStrLn $ stringShowStep u
-        let (g', g'') = split g
-            u' = EnvT (g', f, p) (U (i, j) a)
-            EnvT _ r = extend forestFireRule u'
-        stringShowF (EnvT (g'', f, p) r)
-
-
-    newForest f p = EnvT (g, f, p) (U (0, 0) cells)
+    newForest f p = RandT g (EnvT (f, p) (U (0, 0) cells))
         where
             g = mkStdGen $ round $ 16860353668.0 ** f / p
             empty = listArray ((0, 0), (20, 20)) $ repeat Live

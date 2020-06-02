@@ -94,9 +94,9 @@ module Hascell.Graphics where
     forestExportStep name u n zoom = savePngImage (excitablePath name "png") img
         where
             img = pngFrom2D forestPixels zoom (get u')
-            u' = runRand forestFireRule u n !! (n - 1)
+            u' = run forestFireRule u n !! (n - 1)
 
     forestExport :: String -> Forest -> Int -> Int -> Int -> IO ()
     forestExport name u n zoom delay = either print id $ exportGifFrom2D us forestPixels zoom delay (excitablePath name "gif")
         where
-            us = map get $ runRand forestFireRule u n
+            us = map get $ run forestFireRule u n
