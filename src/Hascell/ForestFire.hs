@@ -43,7 +43,8 @@ module Hascell.ForestFire where
             showCell Dead = "  "
             showRow (U (i, j) a) = concatMap showCell [ extract $ U (i, k) a | k <- [0 .. width u] ]
 
-    newForest f p = RandT g (EnvT (f, p) (U (0, 0) cells))
+    newForest f p = do
+      return (RandT g (EnvT (f, p) (U (0, 0) cells)))
         where
             g = mkStdGen $ round $ 16860353668.0 ** f / p
             empty = listArray ((0, 0), (20, 20)) $ repeat Live

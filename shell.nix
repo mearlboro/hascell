@@ -13,6 +13,7 @@ let
     ghc.comonad
     ghc.JuicyPixels
     ghc.random
+    ghc.fgl
   ];
 
   shell = pkgs.stdenv.mkDerivation {
